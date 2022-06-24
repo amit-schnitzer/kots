@@ -75,7 +75,7 @@ jobs:
             --output-dir ./migrations/fixtures/schema \
             --dbname ship-cloud --driver postgres
       - name: Upload schema artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: schema
           path: ./migrations/fixtures/schema/fixtures.sql
@@ -97,7 +97,7 @@ jobs:
     - name: Build fixtures
       run: export $(cat .image.env | sed 's/#.*//g' | xargs) && make -C migrations/fixtures deps build run
     - name: Upload fixtures artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: fixtures
         path: ./migrations/fixtures/fixtures.sql
@@ -121,7 +121,7 @@ jobs:
       run: |
         export $(cat .image.env | sed 's/#.*//g' | xargs) && make -C migrations schema-release
     - name: Upload airgap image
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: migrations-image
         path: ./migrations/bin/docker-archive
@@ -141,7 +141,7 @@ jobs:
         GIT_TAG: ${{ needs.generate-tag.outputs.tag }}
       run: export $(cat .image.env | sed 's/#.*//g' | xargs) && make -C web deps build-kotsadm
     - name: Upload web artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: web
         path: ./web/dist
@@ -172,7 +172,7 @@ jobs:
         SCOPE_DSN_PUBLIC: ""
       run: export $(cat .image.env | sed 's/#.*//g' | xargs) && make -C kurl_proxy test build
     - name: Upload kurl_proxy artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: kurl_proxy
         path: ./kurl_proxy/bin
@@ -217,7 +217,7 @@ jobs:
         SCOPE_DSN_PUBLIC: ""
       run: export $(cat .image.env | sed 's/#.*//g' | xargs) && make ci-test kots build
     - name: Upload Go API artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: go_api
         path: ./bin
@@ -250,7 +250,7 @@ jobs:
       run: |
         export $(cat .image.env | sed 's/#.*//g' | xargs) && make build-release
     - name: Upload airgap image
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: kotsadm-image
         path: ./bin/docker-archive
