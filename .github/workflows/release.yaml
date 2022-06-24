@@ -456,7 +456,7 @@ jobs:
           version: ${{ matrix.k8s_version }}
       - name: install kots
         run: curl https://kots.io/install/${{ needs.generate-tag.outputs.tag }} | bash
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: '17.x'
       - name: setup testIM
@@ -512,7 +512,7 @@ jobs:
           version: ${{ matrix.k8s_version }}
       - name: install kots
         run: curl https://kots.io/install/${{ needs.generate-tag.outputs.tag }} | bash
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: '17.x'
       - name: setup testIM
@@ -570,7 +570,7 @@ jobs:
       - name: install kots
         run: curl https://kots.io/install/${{ needs.generate-tag.outputs.tag }} | bash
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: '17.x'
 
