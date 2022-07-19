@@ -45,7 +45,7 @@ require (
 	github.com/onsi/gomega v1.19.0
 	github.com/open-policy-agent/opa v0.42.2
 	github.com/openshift/client-go v0.0.0-20210503124028-ac0910aac9fa
-	github.com/otiai10/copy v1.0.2
+	github.com/otiai10/copy v1.7.0
 	github.com/phayes/freeport v0.0.0-20220201140144-74d24b5ae9f5
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
