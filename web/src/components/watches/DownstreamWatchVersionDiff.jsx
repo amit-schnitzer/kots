@@ -23,56 +23,78 @@ class DownstreamWatchVersionDiff extends React.Component {
     };
   }
 
-  fetchRenderedApplicationTree = (sequence, isFirst) => {
+  fetchRenderedApplicationTree = async (sequence, isFirst) => {
     this.setState({ loadingFileTrees: true });
-    const url = `${process.env.API_ENDPOINT}/app/${this.props.slug}/sequence/${sequence}/renderedcontents`;
-    fetch(url, {
-      headers: {
-        Authorization: Utilities.getToken(),
-      },
-      method: "GET",
-    })
-      .then((res) => res.json())
-      .then(async (files) => {
-        if (files.error) {
-          return this.setState({
-            hasErrSettingDiff: true,
-            errSettingDiff: files.error,
-            loadingFileTrees: false,
-            failedSequence: sequence,
-          });
-        }
-        if (isFirst) {
-          this.setState({ firstApplicationTree: files });
-        } else {
-          this.setState({ secondApplicationTree: files });
-        }
-        if (
-          this.state.firstApplicationTree.files &&
-          this.state.secondApplicationTree.files
-        ) {
-          this.setState({ loadingFileTrees: false });
-        }
-      })
-      .catch((err) => {
-        this.setState({ loadingFileTrees: false });
-        throw err;
+    const url = `${process.env.API_ENDPOINT}/app/${this.props.slug}/sequence/${sequence}/rendredcontents`;
+
+    try {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: Utilities.getToken(),
+        },
+        method: "GET",
       });
+
+      const { files } = await res.json();
+      console.log("res", res);
+      if (res === undefined || res.status !== 200) {
+        return this.setState({
+          hasErrSettingDiff: true,
+          errSettingDiff: files.error,
+          loadingFileTrees: false,
+          failedSequence: sequence,
+        });
+      }
+
+      if (isFirst) {
+        this.setState({ firstApplicationTree: files });
+      } else {
+        this.setState({ secondApplicationTree: files });
+      }
+    } catch (err) {
+      console.log(err);
+      this.setState({
+        hasErrSettingDiff: true,
+        errSettingDiff: err,
+        loadingFileTrees: false,
+        failedSequence: sequence,
+      });
+      throw err;
+    }
+  };
+
+  promiseFunc = (data, isFirst) => {
+    return new Promise((resolve, reject) => {
+      let res = this.fetchRenderedApplicationTree(data, isFirst);
+      if (res) {
+        resolve();
+      } else {
+        reject();
+      }
+      // resolve(this.fetchRenderedApplicationTree(data, isFirst))
+    });
   };
 
   componentDidUpdate(lastProps, lastState) {
     const { slug, firstSequence, secondSequence } = this.props;
 
     if (slug !== lastProps.slug) {
-      this.fetchRenderedApplicationTree(firstSequence, true);
-      this.fetchRenderedApplicationTree(secondSequence, false);
+      let promise1 = this.promiseFunc(firstSequence, true);
+      let promise2 = this.promiseFunc(secondSequence, false);
+      Promise.all([promise1, promise2]).then(() => {
+        this.setState({ loadingFileTrees: false });
+      });
     }
   }
 
   componentDidMount() {
     const { firstSequence, secondSequence, location } = this.props;
-    this.fetchRenderedApplicationTree(firstSequence, true);
-    this.fetchRenderedApplicationTree(secondSequence, false);
+
+    let promise1 = this.promiseFunc(firstSequence, true);
+    let promise2 = this.promiseFunc(secondSequence, false);
+    Promise.all([promise1, promise2]).then(() => {
+      this.setState({ loadingFileTrees: false });
+    });
 
     const url = window.location.pathname;
     if (!url.includes("/diff") && !location.search.includes("?diff/")) {
