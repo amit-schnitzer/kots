@@ -1,27 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import Select from "react-select";
 import Modal from "react-modal";
 import { Utilities } from "../../utilities/utilities";
-import enabled from "../../images/enabled.svg";
-import not_enabled from "../../images/not_enabled.svg";
-import warning from "../../images/warning.svg";
+
 import styled from "styled-components";
 import DisableModal from "./modals/DisableModal";
+import {
+  GitOpsContext,
+  withGitOpsConsumer,
+} from "../../features/AppConfig/context";
+import AppSelector from "../../features/AppConfig/components/AppSelector";
+import { getLabel } from "../../features/AppConfig/utils";
 
 const BITBUCKET_SERVER_DEFAULT_HTTP_PORT = "7990";
 const BITBUCKET_SERVER_DEFAULT_SSH_PORT = "7999";
-
-const IconWrapper = styled.div`
-  height: 30px;
-  width: 30px;
-  border-radius: 50%;
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
-  background-color: #ffffff;
-  z-index: 1;
-`;
 
 const SetupProvider = ({
   step,
@@ -121,67 +113,6 @@ const SetupProvider = ({
       setDisablingGitOps(false);
     }
   };
-  const renderIcons = (app) => {
-    if (app?.iconUri) {
-      return (
-        <IconWrapper
-          style={{ backgroundImage: `url(${app?.iconUri})` }}
-        ></IconWrapper>
-      );
-    }
-  };
-  const getLabel = (app) => {
-    const downstream = app?.downstream;
-    const gitops = downstream?.gitops;
-    const gitopsEnabled = gitops?.enabled;
-    const gitopsConnected = gitops?.isConnected;
-
-    return (
-      <div style={{ alignItems: "center", display: "flex" }}>
-        <span style={{ fontSize: 18, marginRight: "10px" }}>
-          {renderIcons(app)}
-        </span>
-        <div className="flex flex-column">
-          <div className={isSingleApp && "u-marginBottom--5"}>
-            {isSingleApp ? (
-              <span
-                style={{
-                  fontSize: "16",
-                  fontWeight: "bold",
-                  color: "#323232",
-                }}
-              >
-                {app.label}
-              </span>
-            ) : (
-              <span style={{ fontSize: 14 }}>{app.label}</span>
-            )}
-          </div>
-          <div style={{ fontSize: "14px" }}>
-            {!gitopsEnabled && !gitopsConnected ? (
-              <div className="flex" style={{ gap: "5px", color: "gray" }}>
-                <img src={not_enabled} alt="not_enabled" />
-                <p>Not Enabled</p>
-              </div>
-            ) : gitopsEnabled && !gitopsConnected ? (
-              <div className="flex" style={{ gap: "5px", color: "orange" }}>
-                <img src={warning} alt="warning" />
-                <p>Repository access needed</p>
-              </div>
-            ) : (
-              gitopsEnabled &&
-              gitopsConnected && (
-                <div className="flex" style={{ gap: "5px", color: "green" }}>
-                  <img src={enabled} alt="enabled" />
-                  <p>Enabled</p>
-                </div>
-              )
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const downstream = app?.downstream;
   const gitops = downstream?.gitops;
@@ -206,27 +137,12 @@ const SetupProvider = ({
           {isSingleApp && app ? (
             <div className="u-marginRight--5">{getLabel(app)}</div>
           ) : (
-            <div className="flex flex1 flex-column u-marginRight--10">
-              <p className="u-fontSize--large u-textColor--primary u-fontWeight--bold u-lineHeight--normal">
-                Select an application to configure
-              </p>
-              <div className="u-position--relative u-marginTop--5 u-marginBottom--10">
-                <Select
-                  className="replicated-select-container select-large "
-                  classNamePrefix="replicated-select"
-                  placeholder="Select an application"
-                  options={apps}
-                  isSearchable={false}
-                  getOptionLabel={(app) => getLabel(app)}
-                  // getOptionValue={(app) => app.label}
-                  value={selectedApp}
-                  onChange={handleAppChange}
-                  isOptionSelected={(option) => {
-                    option.value === selectedApp;
-                  }}
-                />
-              </div>
-            </div>
+            <AppSelector
+              apps={apps}
+              selectedApp={selectedApp}
+              handleAppChange={handleAppChange}
+              isSingleApp={isSingleApp}
+            />
           )}
           <div className="flex flex1 flex-column u-fontSize--small u-marginTop--20">
             {gitopsEnabled && gitopsConnected && (
@@ -268,4 +184,4 @@ const SetupProvider = ({
   );
 };
 
-export default SetupProvider;
+export default withGitOpsConsumer(SetupProvider);

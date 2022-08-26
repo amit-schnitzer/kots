@@ -17,6 +17,10 @@ import "../../scss/components/gitops/GitOpsDeploymentManager.scss";
 import SetupProvider from "./SetupProvider";
 import { Flex, Paragraph } from "../../styles/common";
 import AppGitops from "../apps/AppGitops";
+import {
+  GitOpsContext,
+  withGitOpsConsumer,
+} from "../../features/AppConfig/context";
 
 const STEPS = [
   {
@@ -64,6 +68,7 @@ const BITBUCKET_SERVER_DEFAULT_HTTP_PORT = "7990";
 const BITBUCKET_SERVER_DEFAULT_SSH_PORT = "7999";
 
 class GitOpsDeploymentManager extends React.Component {
+  static contextType = GitOpsContext;
   state = {
     step: "provider",
     hostname: "",
@@ -90,6 +95,7 @@ class GitOpsDeploymentManager extends React.Component {
   componentDidMount() {
     this.getAppsList();
     this.getGitops();
+    console.log("this", this.context);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -966,4 +972,4 @@ class GitOpsDeploymentManager extends React.Component {
   }
 }
 
-export default withRouter(GitOpsDeploymentManager);
+export default withGitOpsConsumer(withRouter(GitOpsDeploymentManager));
